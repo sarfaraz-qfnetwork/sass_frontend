@@ -1,0 +1,93 @@
+<style>
+  #container {
+    border: 1px solid red;
+    width: 1000px;
+    height: 300px;
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    display: flex;
+    overflow-x: auto;
+  }
+
+  #container::-webkit-scrollbar{
+    display: none;
+  }
+
+  #container .item {
+    height: 100%;
+    width: 100%;
+    font-size: 45px;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .item:nth-child(1) {
+    background-color: yellow;
+  }
+
+  .item:nth-child(2) {
+    background-color: blue;
+  }
+
+  .item:nth-child(3) {
+    background-color: green;
+  }
+
+  .item:nth-child(4) {
+    background-color: orange;
+  }
+
+  .item:nth-child(5) {
+    background-color: purple;
+  }
+</style>
+
+<body>
+  <div id="container">
+    <div class="item">1</div>
+    <div class="item">2</div>
+    <div class="item">3</div>
+    <div class="item">4</div>
+    <div class="item">5</div>
+  </div>
+</body>
+
+<script>
+  let isDragStart = false,
+    isDragging = false,
+    prevPageX,
+    prevScrollLeft,
+    positionDiff;
+
+  const container = document.getElementById('container')
+
+
+
+
+  function dragStart(eve) {
+    isDragStart = true;
+    prevPageX = eve.pageX
+    prevScrollLeft = container.scrollLeft
+  }
+
+  function dragging(eve) {
+    isDragging = true;
+    if (isDragStart) {
+      positionDiff = eve.pageX - prevPageX;
+      container.scrollLeft = 0 - positionDiff;
+
+      console.log(eve.pageX, prevPageX, 0 - positionDiff)
+    }
+  }
+
+  function draggStop() {
+    isDragging = isDragStart = false;
+  }
+
+  container.addEventListener('mousedown',dragStart)
+  container.addEventListener('mousemove',dragging)
+  container.addEventListener('mouseup',draggStop)
+  container.addEventListener('mouseleave',draggStop)
+
+</script>

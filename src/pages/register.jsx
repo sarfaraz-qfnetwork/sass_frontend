@@ -9,13 +9,33 @@ import {
   AbsoluteCenter,
   Grid,
   Link,
-  HStack
+  HStack,
+  FormErrorMessage,
+  Alert,
+  AlertIcon,
 } from "@chakra-ui/react";
 import { Link as anchor } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import { ArrowBackIcon } from "@chakra-ui/icons";
+import { useForm } from "react-hook-form"
+import { useState } from "react";
 
 export default function Login() {
+
+  const { register, handleSubmit, formState: { errors }, } = useForm()
+
+  const [hideAlert, setHideAlert] = useState(true)
+  const [response, setResponse] = useState({message:'',status:'success'})
+  const [isLoading, setLoading] = useState(false)
+  const createAccount = () => {
+    setLoading(true)
+    setTimeout(() => {
+      setLoading(false)
+      setResponse({message:'account created',status:'success'})
+      setHideAlert(false)
+    }, 3000)
+  }
+
   return (
     <>
       <Grid placeContent={"center"} height={"100vh"}>
@@ -38,18 +58,25 @@ export default function Login() {
           </Stack>
           <Stack alignItems={"stretch"} w={"320px"} gap={5}>
             <Box>
-              <form>
+              <form onSubmit={handleSubmit(createAccount)}>
                 <Stack gap={3}>
-                  <FormControl borderColor={"primary.500"}>
-                    <Input type="text" size={"md"} placeholder="username" />
+                  <Alert status={response.status} hidden={hideAlert}>
+                    <AlertIcon />
+                    {response.message}
+                  </Alert>
+                  <FormControl borderColor={"primary.500"} isInvalid={errors.username}>
+                    <Input type="text" size={"md"} placeholder="username" {...register('username', { required: 'username is required', minLength: { value: 3, message: 'username must be 3 characters' } })} />
+                    <FormErrorMessage>{errors.username?.message}</FormErrorMessage>
                   </FormControl>
-                  <FormControl borderColor={"primary.500"}>
-                    <Input type="email" size={"md"} placeholder="email" />
+                  <FormControl borderColor={"primary.500"} isInvalid={errors.email}>
+                    <Input type="email" size={"md"} placeholder="email" {...register('email', { required: 'email is required', pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, message: 'Invalid email address' } })} />
+                    <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
                   </FormControl>
-                  <FormControl borderColor={"primary.500"}>
-                    <Input type="password" size={"md"} placeholder="password" />
+                  <FormControl borderColor={"primary.500"} isInvalid={errors.password}>
+                    <Input type="password" size={"md"} placeholder="password" {...register('password', { required: 'password is required', minLength: { value: 8, message: 'password must be 8 characters' } })} />
+                    <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
                   </FormControl>
-                  <Button colorScheme={"primary"}>Register</Button>
+                  <Button isLoading={isLoading} type="submit" colorScheme={"primary"}>Register</Button>
                 </Stack>
               </form>
             </Box>

@@ -26,7 +26,10 @@ function PriceWrapper(props) {
       borderWidth="1px"
       alignSelf={{ base: 'center', lg: 'flex-start' }}
       borderColor={useColorModeValue('gray.200', 'gray.500')}
-      borderRadius={'xl'}>
+      borderRadius={'xl'}
+      data-aos={props.animation}
+      data-aos-delay={props.delay}
+      >
       {children}
     </Box>
   )
@@ -49,7 +52,7 @@ export default function Index() {
         justify="center"
         spacing={{ base: 4, lg: 10 }}
         py={10}>
-        <PriceWrapper>
+        <PriceWrapper animation="fade-up" delay="0">
           <Box py={4} px={12}>
             <Text fontWeight="500" fontSize="2xl">
               Hobby
@@ -92,7 +95,7 @@ export default function Index() {
           </VStack>
         </PriceWrapper>
 
-        <PriceWrapper>
+        <PriceWrapper animation="fade-up" delay="300">
           <Box position="relative">
             <Box
               position="absolute"
@@ -161,7 +164,8 @@ export default function Index() {
             </VStack>
           </Box>
         </PriceWrapper>
-        <PriceWrapper>
+
+        <PriceWrapper animation="fade-up" delay="600">
           <Box py={4} px={12}>
             <Text fontWeight="500" fontSize="2xl">
               Scale

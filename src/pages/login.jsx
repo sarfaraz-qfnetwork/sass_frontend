@@ -10,19 +10,42 @@ import {
   Grid,
   Link,
   HStack,
+  FormErrorMessage,
+  Alert,
+  AlertIcon
 } from "@chakra-ui/react";
 import { Link as anchor } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import { ArrowBackIcon } from "@chakra-ui/icons";
+import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
+
+  const { register, handleSubmit, formState: { errors }, } = useForm()
+
+  const [hideAlert, setHideAlert] = useState(true)
+  const [response, setResponse] = useState({message:'',status:'error'})
+  const [isLoading, setLoading] = useState(false)
+  const navigate = useNavigate()
+  const login = () => {
+    setLoading(true)
+    setTimeout(() => {
+      setLoading(false)
+      navigate('/dashboard')
+      // setHideAlert(false)
+      // setResponse({message:'invalid credentials',status:'error'})
+    }, 3000);
+  }
+
   return (
     <>
       <Grid placeContent={"center"} height={"100vh"}>
         {/* Go back button */}
         <HStack position={'absolute'} top={5} left={5}>
           <ArrowBackIcon />
-          <Link as={anchor}to="/">Go back</Link>
+          <Link as={anchor} to="/">Go back</Link>
         </HStack>
         <Stack alignItems={"center"} gap={5}>
           <Stack align={"center"} gap={5}>
@@ -36,15 +59,21 @@ export default function Login() {
           </Stack>
           <Stack alignItems={"stretch"} w={"320px"} gap={5}>
             <Box>
-              <form>
+              <form onSubmit={handleSubmit(login)}>
                 <Stack gap={3}>
-                  <FormControl borderColor={"primary.500"}>
-                    <Input type="email" size={"md"} placeholder="email" />
+                  <Alert status={response.status} hidden={hideAlert}>
+                    <AlertIcon />
+                    {response.message}
+                  </Alert>
+                  <FormControl borderColor={"primary.500"} isInvalid={errors.email}>
+                    <Input type="email" size={"md"} placeholder="email" {...register('email', { required: 'email is required', pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, message: 'Invalid email address' } })} />
+                    <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
                   </FormControl>
-                  <FormControl borderColor={"primary.500"}>
-                    <Input type="password" size={"md"} placeholder="password" />
+                  <FormControl borderColor={"primary.500"} isInvalid={errors.password}>
+                    <Input type="password" size={"md"} placeholder="password" {...register('password', { required: 'password is required', minLength: { value: 8, message: 'password must be 8 characters' } })} />
+                    <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
                   </FormControl>
-                  <Button colorScheme={"primary"}>Login</Button>
+                  <Button isLoading={isLoading} type="submit" colorScheme={"primary"}>Login</Button>
                 </Stack>
               </form>
             </Box>

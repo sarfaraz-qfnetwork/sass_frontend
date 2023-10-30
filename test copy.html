@@ -8,15 +8,16 @@
     margin: auto;
     display: flex;
     overflow-x: auto;
+    scroll-behavior: smooth;
   }
 
-  #container::-webkit-scrollbar{
+  #container::-webkit-scrollbar {
     display: none;
   }
 
   #container .item {
     height: 100%;
-    width: 100%;
+    width: calc(100% / 3);
     font-size: 45px;
     color: white;
     flex-shrink: 0;
@@ -60,34 +61,57 @@
     prevScrollLeft,
     positionDiff;
 
-  const container = document.getElementById('container')
-
-
-
+  const container = document.getElementById("container");
+  const item = document.querySelector(".item");
 
   function dragStart(eve) {
     isDragStart = true;
-    prevPageX = eve.pageX
-    prevScrollLeft = container.scrollLeft
+    prevPageX = eve.pageX;
+    prevScrollLeft = container.scrollLeft;
+
+    container.style.scrollBehavior = 'auto'
   }
 
   function dragging(eve) {
-    isDragging = true;
+    eve.preventDefault()
     if (isDragStart) {
+      isDragging = true;
       positionDiff = eve.pageX - prevPageX;
-      container.scrollLeft = 0 - positionDiff;
-
-      console.log(eve.pageX, prevPageX, 0 - positionDiff)
+      container.scrollLeft = prevScrollLeft - positionDiff;
     }
   }
 
   function draggStop() {
-    isDragging = isDragStart = false;
+    
+    container.style.scrollBehavior = 'smooth'
+    isDragStart = false;
+    if (!isDragging) return
+    isDragging = false
+
+    autoSlide();
   }
 
-  container.addEventListener('mousedown',dragStart)
-  container.addEventListener('mousemove',dragging)
-  container.addEventListener('mouseup',draggStop)
-  container.addEventListener('mouseleave',draggStop)
+  function autoSlide() {
+    if (container.scrollLeft == container.scrollWidth - container.clientWidth)
+      return;
+    positionDiff = Math.abs(positionDiff);
+    let firstItemWidth = item.clientWidth;
+    let valDifference = firstItemWidth - positionDiff;
 
+    console.log(positionDiff)
+
+    if (container.scrollLeft > prevScrollLeft) {
+      console.log(valDifference)
+      return (container.scrollLeft +=
+        positionDiff > firstItemWidth / 2 ? valDifference : -positionDiff)
+    }
+
+    container.scrollLeft -=
+    positionDiff > firstItemWidth / 2 ? valDifference : -positionDiff
+  }
+
+  container.addEventListener("mousedown", dragStart);
+  container.addEventListener("mousemove", dragging);
+  container.addEventListener("mouseup", draggStop);
+  container.addEventListener("mouseleave", draggStop);
 </script>

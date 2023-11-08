@@ -22,8 +22,11 @@ import {
   ChevronRightIcon,
 } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
+import { useAuthSession } from '../../hooks/authSession'
 
 export default function Header() {
+
+  const session = useAuthSession()
   const { isOpen, onToggle } = useDisclosure();
 
   return (
@@ -73,30 +76,53 @@ export default function Header() {
           direction={"row"}
           spacing={6}
         >
-          <Button
-            as={Link}
-            fontSize={"sm"}
-            fontWeight={400}
-            variant={"link"}
-            to={"/login"}
-          >
-            Sign In
-          </Button>
-          <Button
-            as={Link}
-            display={{ base: "none", md: "inline-flex" }}
-            fontSize={"sm"}
-            fontWeight={600}
-            color={"white"}
-            bg={"black"}
-            to={"/register"}
-            _hover={{
-              bg: "blackAlpha.50",
-              color: "black",
-            }}
-          >
-            Sign Up
-          </Button>
+          {
+            session.status === 'authenticated' ?
+              (
+                <Button
+                  as={Link}
+                  display={{ base: "none", md: "inline-flex" }}
+                  fontSize={"sm"}
+                  fontWeight={600}
+                  color={"white"}
+                  bg={"black"}
+                  to={"/dashboard"}
+                  _hover={{
+                    bg: "blackAlpha.50",
+                    color: "black",
+                  }}
+                >
+                  Dashboard
+                </Button>
+              ) :
+              (
+                <>
+                  <Button
+                    as={Link}
+                    fontSize={"sm"}
+                    fontWeight={400}
+                    variant={"link"}
+                    to={"/login"}
+                  >
+                    Sign In
+                  </Button>
+                  <Button
+                    as={Link}
+                    display={{ base: "none", md: "inline-flex" }}
+                    fontSize={"sm"}
+                    fontWeight={600}
+                    color={"white"}
+                    bg={"black"}
+                    to={"/register"}
+                    _hover={{
+                      bg: "blackAlpha.50",
+                      color: "black",
+                    }}
+                  >
+                    Sign Up
+                  </Button>
+                </>)
+          }
         </Stack>
       </Flex>
 

@@ -18,23 +18,45 @@ import { Link as anchor } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { useForm } from "react-hook-form"
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuthSession } from "../hooks/authSession";
+import axios from "axios";
 
 export default function Login() {
 
   const { register, handleSubmit, formState: { errors }, } = useForm()
 
   const [hideAlert, setHideAlert] = useState(true)
-  const [response, setResponse] = useState({message:'',status:'success'})
+  const [response, setResponse] = useState({ message: '', status: 'success' })
   const [isLoading, setLoading] = useState(false)
-  const createAccount = () => {
+  const navigate = useNavigate()
+  const session = useAuthSession()
+  const createAccount = async (data) => {
+
+
     setLoading(true)
-    setTimeout(() => {
+    try {
+      const response = await axios.post('/register', data)
+      console.log(response.data);
+      setResponse({ message: response.data.message, status: 'success' })
+      setTimeout(() => {
+        navigate('/login')
+      }, 3000);
+    } catch (error) {
+      setResponse({ message: error.response.data.message, status: 'error' })
+    } finally {
       setLoading(false)
-      setResponse({message:'account created',status:'success'})
       setHideAlert(false)
-    }, 3000)
+    }
   }
+
+  useEffect(() => {
+    if (session.status === 'authenticated') {
+      navigate('/dashboard')
+    }
+  }, [navigate, session])
+
 
   return (
     <>

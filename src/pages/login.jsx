@@ -18,26 +18,45 @@ import { Link as anchor } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { useDispatch } from 'react-redux'
+import { signIn } from '../store/slice/auth'
+import { useAuthSession } from '../hooks/authSession'
+import axios from "axios";
 export default function Login() {
 
   const { register, handleSubmit, formState: { errors }, } = useForm()
 
   const [hideAlert, setHideAlert] = useState(true)
-  const [response, setResponse] = useState({message:'',status:'error'})
+  const [response, setResponse] = useState({ message: '', status: 'error' })
   const [isLoading, setLoading] = useState(false)
   const navigate = useNavigate()
-  const login = () => {
+  const dispatch = useDispatch()
+  const session = useAuthSession()
+
+  const login = async (data) => {
+
     setLoading(true)
-    setTimeout(() => {
+    try {
+      const response = await axios.post('/login', data)
+      dispatch(signIn(response.data))
+    } catch (error) {
+      setResponse({ message: error.response.data.message, status: 'error' })
+    } finally {
       setLoading(false)
-      navigate('/dashboard')
-      // setHideAlert(false)
-      // setResponse({message:'invalid credentials',status:'error'})
-    }, 3000);
+      setHideAlert(false)
+    }
   }
+  const googleLogin = ()=>{
+    location.href = "http://127.0.0.1:8000/auth/google";
+  }
+
+  useEffect(() => {
+    if (session.status === 'authenticated') {
+      navigate('/dashboard')
+    }
+  }, [navigate, session])
 
   return (
     <>
@@ -87,7 +106,7 @@ export default function Login() {
 
             <Box>
               <Stack>
-                <Button variant="outline" leftIcon={<FcGoogle />}>
+                <Button variant="outline" leftIcon={<FcGoogle />} onClick={googleLogin}>
                   Contine with google
                 </Button>
               </Stack>

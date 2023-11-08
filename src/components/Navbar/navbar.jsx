@@ -19,9 +19,17 @@ import {
     FiBell,
     FiChevronDown,
 } from 'react-icons/fi'
-
+import { useAuthSession } from '../../hooks/authSession'
+import { useDispatch } from "react-redux"
+import { signOut } from "../../store/slice/auth"
+import { Link } from 'react-router-dom'
 
 export default function Navbar({ onOpen, ...rest }) {
+    const { user } = useAuthSession()
+    const dispatch = useDispatch()
+    const logout = () => {
+        dispatch(signOut())
+    }
     return (
         <Flex
             ml={{ base: 0, md: 60 }}
@@ -46,7 +54,7 @@ export default function Navbar({ onOpen, ...rest }) {
                 fontSize="2xl"
                 fontFamily="monospace"
                 fontWeight="bold">
-                <Logo/>
+                <Logo />
             </Text>
 
             <HStack spacing={{ base: '0', md: '6' }}>
@@ -66,9 +74,9 @@ export default function Navbar({ onOpen, ...rest }) {
                                     alignItems="flex-start"
                                     spacing="1px"
                                     ml="2">
-                                    <Text fontSize="sm">Justina Clark</Text>
+                                    <Text fontSize="sm">{user?.username}</Text>
                                     <Text fontSize="xs" color="gray.600">
-                                        Admin
+                                        {user?.email}
                                     </Text>
                                 </VStack>
                                 <Box display={{ base: 'none', md: 'flex' }}>
@@ -79,11 +87,11 @@ export default function Navbar({ onOpen, ...rest }) {
                         <MenuList
                             bg={useColorModeValue('white', 'gray.900')}
                             borderColor={useColorModeValue('gray.200', 'gray.700')}>
-                            <MenuItem>Profile</MenuItem>
+                            <MenuItem as={Link} to="/profile">Profile</MenuItem>
                             <MenuItem>Settings</MenuItem>
                             <MenuItem>Billing</MenuItem>
                             <MenuDivider />
-                            <MenuItem>Sign out</MenuItem>
+                            <MenuItem onClick={logout}>Sign out</MenuItem>
                         </MenuList>
                     </Menu>
                 </Flex>

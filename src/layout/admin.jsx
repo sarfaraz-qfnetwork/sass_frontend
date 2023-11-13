@@ -1,3 +1,4 @@
+
 /* eslint-disable react/prop-types */
 import {
     Box,
@@ -9,30 +10,25 @@ import {
     Drawer,
     DrawerContent,
     useDisclosure,
-    Alert,
-    AlertTitle,
-    AlertDescription,
-    AlertIcon,
 } from '@chakra-ui/react'
 import {
-    FiTrendingUp,
-    FiCompass,
     FiBox,
     FiUsers,
-    FiTag
+    FiTag,
+    FiUserPlus
 } from 'react-icons/fi'
+import {
+    TfiTicket
+} from 'react-icons/tfi'
 import { Link, useLocation } from 'react-router-dom';
-
 import Navbar from '../components/Navbar/navbar'
-import { useAuthSession } from '../hooks/authSession';
-import axios from 'axios';
 
 const LinkItems = [
     { name: 'Dashboard', to: '/dashboard', icon: FiBox },
-    { name: 'Trending', to: '#', icon: FiTrendingUp },
-    { name: 'Explore', to: '#', icon: FiCompass },
-    { name: 'Plane', to: '/plane', icon: FiTag },
-    { name: 'Subscribers', to: '/subscribers', icon: FiUsers },
+    { name: 'Users', to: '/users', icon: FiUsers },
+    { name: 'Tickets', to: '/tickets', icon: TfiTicket },
+    { name: 'Subscription planes', to: '/plane', icon: FiTag },
+    { name: 'New members', to: '/subscribers', icon: FiUserPlus },
 ]
 
 const SidebarContent = ({ onClose, ...rest }) => {
@@ -103,16 +99,8 @@ const NavItem = ({ icon, children, href, ...rest }) => {
 
 export default function App({ children }) {
 
-    const session = useAuthSession()
     const { isOpen, onOpen, onClose } = useDisclosure()
 
-    const verifyEmail = async () => {
-        const response = await axios.post('email/resend', null, {
-            headers: { Authorization: `Bearer ${session.token}` }
-        })
-
-        console.log(response.data);
-    }
 
     return (
         <Box minH="100vh" bg={useColorModeValue('gray.100', 'gray.900')}>
@@ -131,18 +119,6 @@ export default function App({ children }) {
             {/* mobilenav */}
             <Navbar onOpen={onOpen} />
             <Box ml={{ base: 0, md: 60 }} p="4">
-                {
-                    !session.is_verified &&
-                    <Box marginBottom="3">
-                        <Alert status='error' flexWrap="wrap">
-                            <AlertIcon />
-                            <AlertTitle>Verify your account!</AlertTitle>
-                            <AlertDescription>check your email <u>{session.user?.email}</u> <Text as="span" cursor="pointer" _hover={{ textDecoration: '1px solid underline' }} color="red.600" fontWeight="medium" onClick={verifyEmail}>resend code</Text>
-                            </AlertDescription>
-                        </Alert>
-                    </Box>
-
-                }
                 {children}
             </Box>
         </Box>

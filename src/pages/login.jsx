@@ -23,6 +23,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from 'react-redux'
 import { signIn } from '../store/slice/auth'
 import { useAuthSession } from '../hooks/authSession'
+import { GoogleLogin } from 'react-google-login';
 import axios from "axios";
 export default function Login() {
 
@@ -48,8 +49,8 @@ export default function Login() {
       setHideAlert(false)
     }
   }
-  const googleLogin = ()=>{
-    location.href = "http://127.0.0.1:8000/auth/google";
+  const googleLogin = (e) => {
+    console.log(e.details);
   }
 
   useEffect(() => {
@@ -106,9 +107,19 @@ export default function Login() {
 
             <Box>
               <Stack>
-                <Button variant="outline" leftIcon={<FcGoogle />} onClick={googleLogin}>
-                  Contine with google
-                </Button>
+
+                <GoogleLogin
+                  clientId="93684639738-tvqu53l68ir38ljivuml2n4kd3e09t64.apps.googleusercontent.com"
+                  buttonText="Login with Google"
+                  onSuccess={googleLogin}
+                  onFailure={googleLogin}
+                  cookiePolicy={'none'}
+                  render={(renderProps) => (
+                    <Button variant="outline" leftIcon={<FcGoogle />} onClick={renderProps.onClick}>
+                      Contine with google
+                    </Button>
+                  )}
+                />
               </Stack>
             </Box>
 

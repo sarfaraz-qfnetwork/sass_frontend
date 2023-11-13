@@ -6,10 +6,11 @@ import { ChakraProvider } from '@chakra-ui/react'
 import { BrowserRouter } from 'react-router-dom'
 import { store } from './store/store'
 import { Provider } from 'react-redux'
+
 import './index.css'
 import 'aos/dist/aos.css'
 
-axios.defaults.baseURL = 'http://192.168.1.121:8000/api/';
+axios.defaults.baseURL = 'https://phpstack-820604-4052369.cloudwaysapps.com/api/';
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 
 ReactDOM.createRoot(document.getElementById('root')).render(

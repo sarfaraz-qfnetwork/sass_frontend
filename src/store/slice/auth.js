@@ -26,7 +26,9 @@ export const authSlice = createSlice({
         loadSession: () => {
             const session = localStorage.getItem('auth_session')
             if (session && session.token !== "") {
-                return JSON.parse(session)
+                const sessionData = JSON.parse(session)
+                axios.defaults.headers.common['Authorization'] = `Bearer ${sessionData.token}`;
+                return sessionData
             }
             return { user: null, token: null, status: 'unauthenticated' }
         }

@@ -13,19 +13,23 @@ import {
     AlertTitle,
     AlertDescription,
     AlertIcon,
+    VStack,
+    Button,
 } from '@chakra-ui/react'
 import {
     FiTrendingUp,
     FiCompass,
     FiBox,
     FiUsers,
-    FiTag
+    FiTag,
+    FiZap
 } from 'react-icons/fi'
 import { Link, useLocation } from 'react-router-dom';
 
 import Navbar from '../components/Navbar/navbar'
 import { useAuthSession } from '../hooks/authSession';
 import axios from 'axios';
+import { useState } from 'react';
 
 const LinkItems = [
     { name: 'Dashboard', to: '/dashboard', icon: FiBox },
@@ -46,6 +50,7 @@ const SidebarContent = ({ onClose, ...rest }) => {
             pos="fixed"
             h="full"
             {...rest}>
+
             <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
                 <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
                     <Logo />
@@ -57,6 +62,12 @@ const SidebarContent = ({ onClose, ...rest }) => {
                     {link.name}
                 </NavItem>
             ))}
+            <Dropdown name="campaign">
+                <NavItem icon={FiZap}>
+                    Campaign
+                </NavItem>
+            </Dropdown>
+
         </Box>
     )
 }
@@ -101,6 +112,37 @@ const NavItem = ({ icon, children, href, ...rest }) => {
     )
 }
 
+const Dropdown = ({name, children }) => {
+    const [showDropDown, setShowDropDown] = useState(true);
+    const toggleDropdownMenu = ()=>{
+        setShowDropDown(val=>!val)
+    }
+    return <>
+        <Box
+            onClick={toggleDropdownMenu}
+            color={true && 'primary.500'}
+            fontWeight={true && 'bold'}
+            style={{ textDecoration: 'none' }}
+            _focus={{ boxShadow: 'none' }}>
+            <Flex
+                align="center"
+                p="4"
+                mx="4"
+                borderRadius="lg"
+                role="group"
+                cursor="pointer"
+                _hover={{
+                    bg: 'primary.500',
+                    color: 'white',
+                }}>
+                {name}
+            </Flex>
+        </Box>
+        <VStack hidden={showDropDown} alignItems='stretch'>
+            {children}
+        </VStack>
+    </>
+}
 export default function App({ children }) {
 
     const session = useAuthSession()

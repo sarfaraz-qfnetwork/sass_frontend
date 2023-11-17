@@ -10,8 +10,10 @@ import { Provider } from 'react-redux'
 import './index.css'
 import 'aos/dist/aos.css'
 
-axios.defaults.baseURL = 'https://phpstack-820604-4052369.cloudwaysapps.com/api/';
+// axios.defaults.baseURL = 'https://phpstack-820604-4052369.cloudwaysapps.com/api/';
+axios.defaults.baseURL = 'http://192.168.1.117:8000/api/';
 axios.defaults.headers.post['Content-Type'] = 'application/json';
+
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <ChakraProvider theme={theme}>

@@ -42,7 +42,7 @@ export default function App() {
       <Route path='/contact' Component={Contact} />
       <Route path='/register' Component={Register} />
       <Route path='/login' Component={Login} />
-      <Route path='/dashboard' element={<Protected><AdminDashboard /></Protected>} />
+      <Route path='/dashboard' element={<Protected><Dashboard /></Protected>} />
       <Route path='/profile' element={<Protected><Profile /></Protected>} />
       <Route path='/plane' element={<Protected><Plane /></Protected>} />
       {/* admin routes */}

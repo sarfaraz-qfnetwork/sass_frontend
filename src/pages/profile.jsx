@@ -1,44 +1,62 @@
 import { Text, VStack, Grid, FormControl, FormLabel, Input, InputGroup, InputRightElement, Select, Switch, FormErrorMessage, Stack, GridItem, Button } from "@chakra-ui/react"
 import { FiEye, FiEyeOff } from 'react-icons/fi'
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import Layout from "../layout/app"
+import axios from "axios"
 
-const _user = {
-    fname: 'test',
-    lname: 'test',
-    company: 'test',
-    phone: '0312-3847665',
-    address: 'xyz street abc road usa',
-    country: 'usa',
-    street: 'xyz',
-    zip: '78900',
-    state: 'WC',
-
-    email: 'test@test.com',
-    password: 'password12345678',
-    twofactor: true
-}
 
 export default function Profile() {
 
-    const { register: registerInfo, handleSubmit: handleSubmitInfo, formState: { errors: errorsInfo, isDirty:isDirtyInfo }, } = useForm()
+    const { register: registerInfo, handleSubmit: handleSubmitInfo, setValue, formState: { errors: errorsInfo, isDirty: isDirtyInfo }, } = useForm()
     const { register: registerEmail, handleSubmit: handleSubmitEmail, watch, formState: { errors: errorsEmail, isDirty }, } = useForm()
     const { register: registerPassword, handleSubmit: handleSubmitPassword, watch: watchPassword, formState: { errors: errorsPassword }, } = useForm()
     const [showPassword, setPasswordVisibility] = useState(false)
-    const [user, setUser] = useState(_user)
+    const [user, setUser] = useState({})
 
-    const changePersonalInfo = (data) => {
-        console.log(data)
+    const fetchUserDetails = async () => {
+        const response = await axios.get('http://192.168.1.117:8000/api/users/2')
+        const user = response.data
+        setUser(user)
+        setValue('first_name', user.first_name)
+        setValue('last_name', user.last_name)
+        setValue('phone_number', user.phone_number)
+        setValue('address', user.address)
+        setValue('street', user.street)
+        setValue('zipcode', user.zipcode)
+        setValue('state', user.state)
+        setValue('city', user.city)
     }
 
-    const changeEmail = (data) => {
-        console.log(data)
+    const changePersonalInfo = async (data) => {
+        try {
+            const response = await axios.put('users/2', data)
+            console.log("change data", response.data);
+
+        } catch (error) {
+            alert('something went wrong')
+        }
+    }
+
+    const changeEmail = async (data) => {
+        try {
+            const response = await axios.post('update-email',data)
+            console.log(response.data);
+
+        } catch (error) {
+            alert("something went wrong")
+        }
     }
 
     const changePassword = (data) => {
         console.log(data)
     }
+
+
+    useEffect(() => {
+        fetchUserDetails()
+    }, [])
+
 
     return <Layout>
         <VStack alignItems="stretch" gap="5">
@@ -47,17 +65,17 @@ export default function Profile() {
                     <Text fontSize="xl" fontWeight="medium" mb="3">Personal information</Text>
                     <Grid templateColumns={{ base: "1fr", md: "repeat(2,1fr)" }} gap="2">
                         <GridItem>
-                            <FormControl isInvalid={errorsInfo.fname} isRequired>
+                            <FormControl isInvalid={errorsInfo.first_name} isRequired>
                                 <FormLabel>Fisrt name</FormLabel>
-                                <Input type="text" defaultValue={user.fname} {...registerInfo('fname', { required: 'This field is required', minLength: { value: 3, message: 'minimum 3 characters required' } })} />
-                                <FormErrorMessage>{errorsInfo.fname?.message}</FormErrorMessage>
+                                <Input type="text" defaultValue={user.first_name} {...registerInfo('first_name', { required: 'This field is required', minLength: { value: 3, message: 'minimum 3 characters required' } })} />
+                                <FormErrorMessage>{errorsInfo.first_name?.message}</FormErrorMessage>
                             </FormControl>
                         </GridItem>
                         <GridItem>
-                            <FormControl isInvalid={errorsInfo.lname} isRequired>
+                            <FormControl isInvalid={errorsInfo.last_name} isRequired>
                                 <FormLabel>Last name</FormLabel>
-                                <Input type="text" defaultValue={user.lname} {...registerInfo('lname', { required: 'This field is required', minLength: { value: 3, message: 'minimum 3 characters required' } })} />
-                                <FormErrorMessage>{errorsInfo.lname?.message}</FormErrorMessage>
+                                <Input type="text" defaultValue={user.last_name} {...registerInfo('last_name', { required: 'This field is required', minLength: { value: 3, message: 'minimum 3 characters required' } })} />
+                                <FormErrorMessage>{errorsInfo.last_name?.message}</FormErrorMessage>
                             </FormControl>
                         </GridItem>
                     </Grid>
@@ -65,21 +83,20 @@ export default function Profile() {
                         <GridItem>
                             <FormControl>
                                 <FormLabel>Company name</FormLabel>
-                                <Input type="text" defaultValue={user.company} />
-                                <FormErrorMessage>Last name is required</FormErrorMessage>
+                                <Input type="text" defaultValue={user.company_name} {...registerInfo('company_name')} />
                             </FormControl>
                         </GridItem>
                     </Grid>
                     <Grid>
                         <GridItem>
-                            <FormControl isInvalid={errorsInfo.phone} isRequired>
+                            <FormControl isInvalid={errorsInfo.phone_number} isRequired>
                                 <FormLabel>Phone</FormLabel>
-                                <Input type="text" defaultValue={user.phone} {...registerInfo('phone', { required: 'This field is required', minLength: { value: 7, message: 'minimum 7 digits required' }, pattern: { value: /^[0-9-]+$/, message: 'Invalid phone number', }, })} />
-                                <FormErrorMessage>{errorsInfo.phone?.message}</FormErrorMessage>
+                                <Input type="text" defaultValue={user.phone_number} {...registerInfo('phone_number', { required: 'This field is required', minLength: { value: 7, message: 'minimum 7 digits required' }, pattern: { value: /^[0-9-]+$/, message: 'Invalid phone number', }, })} />
+                                <FormErrorMessage>{errorsInfo.phone_number?.message}</FormErrorMessage>
                             </FormControl>
                         </GridItem>
                     </Grid>
-                    <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap="2">
+                    <Grid>
                         <GridItem colSpan={2}>
                             <FormControl isInvalid={errorsInfo.address} isRequired>
                                 <FormLabel>Address line</FormLabel>
@@ -87,6 +104,8 @@ export default function Profile() {
                                 <FormErrorMessage>{errorsInfo.address?.message}</FormErrorMessage>
                             </FormControl>
                         </GridItem>
+                    </Grid>
+                    <Grid templateColumns={{ base: "1rf", md: "repeat(2,1fr)" }} gap="2">
                         <GridItem>
                             <FormControl isInvalid={errorsInfo.country} isRequired>
                                 <FormLabel>Country</FormLabel>
@@ -98,6 +117,17 @@ export default function Profile() {
                                 <FormErrorMessage>{errorsInfo.country?.message}</FormErrorMessage>
                             </FormControl>
                         </GridItem>
+
+                        <GridItem>
+                            <FormControl>
+                                <FormControl isInvalid={errorsInfo.city} isRequired>
+                                    <FormLabel>City</FormLabel>
+                                    <Input defaultValue={user.city} {...registerInfo('city', { required: 'This field is required' })} />
+                                    <FormErrorMessage>{errorsInfo.city?.message}</FormErrorMessage>
+                                </FormControl>
+                            </FormControl>
+                        </GridItem>
+
                     </Grid>
                     <Grid templateColumns={{ base: "1rf", md: "repeat(3,1fr)" }} gap="2">
                         <GridItem>
@@ -109,10 +139,10 @@ export default function Profile() {
                         </GridItem>
                         <GridItem>
                             <FormControl>
-                                <FormControl isInvalid={errorsInfo.zip} isRequired>
+                                <FormControl isInvalid={errorsInfo.zipcode} isRequired>
                                     <FormLabel>Zip code</FormLabel>
-                                    <Input min="0" type="number" defaultValue={user.zip} {...registerInfo('zip', { required: 'This field is required' })} />
-                                    <FormErrorMessage>{errorsInfo.zip?.message}</FormErrorMessage>
+                                    <Input min="0" type="number" defaultValue={user.zipcode} {...registerInfo('zipcode', { required: 'This field is required' })} />
+                                    <FormErrorMessage>{errorsInfo.zipcode?.message}</FormErrorMessage>
                                 </FormControl>
                             </FormControl>
                         </GridItem>
@@ -137,7 +167,7 @@ export default function Profile() {
                         <GridItem>
                             <FormControl>
                                 <FormLabel>Current email</FormLabel>
-                                <Input type="email" defaultValue={'test@gmail.com'} readOnly />
+                                <Input type="email" defaultValue={user.email} readOnly />
                                 <FormErrorMessage>Last name is required</FormErrorMessage>
                             </FormControl>
                         </GridItem>
@@ -160,10 +190,10 @@ export default function Profile() {
                             </FormControl>
                         </GridItem>
                     </Grid>
-
                     <Button type="submit" mt="2" alignSelf="start" colorScheme="primary">Save</Button>
                 </Stack>
             </form>
+
             <form onSubmit={handleSubmitPassword(changePassword)} noValidate>
                 <Stack background={"whiteAlpha.900"} gap="2" padding="5" rounded="md">
                     <Text fontSize="xl" fontWeight="medium" mb="3">Change password</Text>
@@ -207,6 +237,7 @@ export default function Profile() {
                     <Button type="submit" mt="2" alignSelf="start" colorScheme="primary">Save</Button>
                 </Stack>
             </form>
+
             <form>
                 <Stack background={"whiteAlpha.900"} gap="2" padding="5" rounded="md">
                     <Grid>

@@ -2,9 +2,11 @@ import { Text, VStack, Grid, FormControl, FormLabel, Input, InputGroup, InputRig
 import { FiEye, FiEyeOff } from 'react-icons/fi'
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
+import { useDispatch } from "react-redux"
+import { signOut } from "../store/slice/auth"
 import Layout from "../layout/app"
 import axios from "axios"
-
+import { useAuthSession } from "../hooks/authSession"
 
 export default function Profile() {
 
@@ -13,9 +15,11 @@ export default function Profile() {
     const { register: registerPassword, handleSubmit: handleSubmitPassword, watch: watchPassword, formState: { errors: errorsPassword }, } = useForm()
     const [showPassword, setPasswordVisibility] = useState(false)
     const [user, setUser] = useState({})
+    const dispatch = useDispatch()
+    const session = useAuthSession()
 
     const fetchUserDetails = async () => {
-        const response = await axios.get('http://192.168.1.117:8000/api/users/2')
+        const response = await axios.get(`users/${session.user?.id}`)
         const user = response.data
         setUser(user)
         setValue('first_name', user.first_name)
@@ -30,7 +34,7 @@ export default function Profile() {
 
     const changePersonalInfo = async (data) => {
         try {
-            const response = await axios.put('users/2', data)
+            const response = await axios.put(`users/${session.user?.id}`, data)
             console.log("change data", response.data);
 
         } catch (error) {
@@ -40,22 +44,42 @@ export default function Profile() {
 
     const changeEmail = async (data) => {
         try {
-            const response = await axios.post('update-email',data)
-            console.log(response.data);
-
+            await axios.post(`update-email/${session.user?.id}`, data)
+            fetchUserDetails()
         } catch (error) {
+            console.log(error);
+            //     const status = error.response.status
+            //     if (status === 401) {
+            //         dispatch(signOut())
+            //         alert('session expired')
+            //         return
+            //     }
             alert("something went wrong")
         }
     }
 
-    const changePassword = (data) => {
-        console.log(data)
+    const changePassword = async (data) => {
+        try {
+            console.log(await axios.post(`update-password/${session.user?.id}`, data))
+        } catch (error) {
+            console.log(error);
+            //     const status = error.response.status
+            //     if (status === 401) {
+            //         dispatch(signOut())
+            //         alert('session expired')
+            //         return
+            //     }
+            alert("something went wrong")
+        }
     }
 
 
     useEffect(() => {
-        fetchUserDetails()
-    }, [])
+        if (session.user) {
+            fetchUserDetails()
+        }
+    }, [session])
+
 
 
     return <Layout>
@@ -199,14 +223,14 @@ export default function Profile() {
                     <Text fontSize="xl" fontWeight="medium" mb="3">Change password</Text>
                     <Grid>
                         <GridItem>
-                            <FormControl>
+                            <FormControl isInvalid={errorsPassword.current_password}>
                                 <FormLabel>Current password</FormLabel>
                                 <InputGroup size='md'>
                                     <Input
                                         pr='4.5rem'
                                         type={showPassword ? 'text' : 'password'}
                                         defaultValue={user.password}
-                                        readOnly
+                                        {...registerPassword('current_password', { required: 'This field is required', minLength: { value: 8, message: 'password must be 8 characters long' } })}
                                     />
                                     <InputRightElement width='4.5rem'>
                                         <Button h='1.75rem' size='sm' onClick={() => setPasswordVisibility(visibility => !visibility)}>
@@ -214,16 +238,17 @@ export default function Profile() {
                                         </Button>
                                     </InputRightElement>
                                 </InputGroup>
+                                <FormErrorMessage>{errorsPassword.current_password?.message}</FormErrorMessage>
                             </FormControl>
                         </GridItem>
                     </Grid>
 
                     <Grid templateColumns={{ base: "1rf", md: "repeat(2,1fr)" }} gap="2">
                         <GridItem>
-                            <FormControl isInvalid={errorsPassword.password}>
-                                <FormLabel>New password</FormLabel>
-                                <Input type="text" {...registerPassword('password', { required: 'This field is required', minLength: { value: 8, message: 'password must be 8 characters long' } })} />
-                                <FormErrorMessage>{errorsPassword.password?.message}</FormErrorMessage>
+                            <FormControl isInvalid={errorsPassword.new_password}>
+                                <FormLabel>New new_password</FormLabel>
+                                <Input type="text" {...registerPassword('new_password', { required: 'This field is required', minLength: { value: 8, message: 'password must be 8 characters long' } })} />
+                                <FormErrorMessage>{errorsPassword.new_password?.message}</FormErrorMessage>
                             </FormControl>
                         </GridItem>
                         <GridItem>

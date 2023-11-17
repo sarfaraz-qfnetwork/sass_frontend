@@ -57,16 +57,18 @@ const SidebarContent = ({ onClose, ...rest }) => {
                 </Text>
                 <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
             </Flex>
+
+            <Dropdown name="campaign" icon={FiZap}>
+                <NavItem icon={FiZap}>
+                    Campaign
+                </NavItem>
+            </Dropdown>
             {LinkItems.map((link) => (
                 <NavItem key={link.name} icon={link.icon} href={link.to}>
                     {link.name}
                 </NavItem>
             ))}
-            <Dropdown name="campaign">
-                <NavItem icon={FiZap}>
-                    Campaign
-                </NavItem>
-            </Dropdown>
+            
 
         </Box>
     )
@@ -112,10 +114,10 @@ const NavItem = ({ icon, children, href, ...rest }) => {
     )
 }
 
-const Dropdown = ({name, children }) => {
+const Dropdown = ({ name, icon, children }) => {
     const [showDropDown, setShowDropDown] = useState(true);
-    const toggleDropdownMenu = ()=>{
-        setShowDropDown(val=>!val)
+    const toggleDropdownMenu = () => {
+        setShowDropDown(val => !val)
     }
     return <>
         <Box
@@ -136,6 +138,14 @@ const Dropdown = ({name, children }) => {
                     color: 'white',
                 }}>
                 {name}
+                <Icon
+                    ml="4"
+                    fontSize="16"
+                    _groupHover={{
+                        color: 'white',
+                    }}
+                    as={FiZap}
+                />
             </Flex>
         </Box>
         <VStack hidden={showDropDown} alignItems='stretch'>
